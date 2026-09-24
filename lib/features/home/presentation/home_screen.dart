@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/section_header.dart';
 import '../../../shared/widgets/saho_search_bar.dart';
+import '../../services/presentation/service_discovery_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -63,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                   action: 'See all',
                   ),
                   const SizedBox(height: 18),
-                  _buildCategoryGrid(),
+                  _buildCategoryGrid(context),
                   const SizedBox(height: 32),
                   const SectionHeader(
                   title: 'Popular near you',
@@ -178,7 +179,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryGrid() {
+  Widget _buildCategoryGrid(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -192,7 +193,18 @@ class HomeScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         final category = _categories[index];
 
-        return Column(
+      return InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ServiceDiscoveryScreen(
+              categoryName: category.name,
+      ),
+    ),
+  );
+},
+     child: Column(
           children: [
             Expanded(
               child: Container(
@@ -224,7 +236,8 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ],
-        );
+        ),
+      );
       },
     );
   }
