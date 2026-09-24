@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
+import 'customer_shell.dart';
 
 class SahoApp extends StatelessWidget {
   const SahoApp({super.key});
@@ -11,7 +12,7 @@ class SahoApp extends StatelessWidget {
       title: 'SAHO',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const SahoFoundationScreen(),
+      home: const CustomerShell(),
     );
   }
 }
