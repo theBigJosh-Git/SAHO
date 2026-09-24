@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../../shared/widgets/saho_search_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -54,18 +56,18 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 28),
                   _buildHeroSection(),
                   const SizedBox(height: 24),
-                  _buildSearchBar(),
+                  const SahoSearchBar(),
                   const SizedBox(height: 32),
-                  _buildSectionHeader(
-                    title: 'Services',
-                    action: 'See all',
+                  const SectionHeader(
+                  title: 'Services',
+                  action: 'See all',
                   ),
                   const SizedBox(height: 18),
                   _buildCategoryGrid(),
                   const SizedBox(height: 32),
-                  _buildSectionHeader(
-                    title: 'Popular near you',
-                    action: 'View all',
+                  const SectionHeader(
+                  title: 'Popular near you',
+                  action: 'View all',
                   ),
                   const SizedBox(height: 16),
                   _buildPopularServiceCard(),
@@ -173,58 +175,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return TextField(
-      readOnly: true,
-      decoration: InputDecoration(
-        hintText: 'What service do you need?',
-        prefixIcon: const Icon(
-          Icons.search_rounded,
-          color: AppColors.textSecondary,
-        ),
-        suffixIcon: Container(
-          margin: const EdgeInsets.all(7),
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(
-            Icons.tune_rounded,
-            color: Colors.white,
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader({
-    required String title,
-    required String action,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        Text(
-          action,
-          style: const TextStyle(
-            color: AppColors.primary,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
     );
   }
 
