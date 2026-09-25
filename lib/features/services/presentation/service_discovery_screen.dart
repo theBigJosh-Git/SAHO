@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../data/service_catalog.dart';
 import '../domain/service_item.dart';
+import 'service_details_screen.dart';
 
 class ServiceDiscoveryScreen extends StatelessWidget {
   final String categoryName;
@@ -46,8 +47,17 @@ class ServiceDiscoveryScreen extends StatelessWidget {
               (service) => Padding(
                 padding: const EdgeInsets.only(bottom: 14),
                 child: _ServiceCard(
-                  service: service,
-                ),
+  service: service,
+  onTap: () {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ServiceDetailsScreen(
+          service: service,
+        ),
+      ),
+    );
+  },
+),
               ),
             ),
           ],
@@ -59,14 +69,19 @@ class ServiceDiscoveryScreen extends StatelessWidget {
 
 class _ServiceCard extends StatelessWidget {
   final ServiceItem service;
+  final VoidCallback? onTap;
 
   const _ServiceCard({
     required this.service,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+  onTap: onTap,
+  borderRadius: BorderRadius.circular(20),
+  child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -131,7 +146,8 @@ class _ServiceCard extends StatelessWidget {
             color: AppColors.textSecondary,
           ),
         ],
+           ),
       ),
-    );
+  );
   }
 }
