@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../services/domain/service_item.dart';
 import '../domain/provider_item.dart';
+import '../../bookings/domain/booking_draft.dart';
+import '../../bookings/presentation/create_booking_screen.dart';
 
 class ProviderProfileScreen extends StatelessWidget {
   final ProviderItem provider;
@@ -129,7 +131,19 @@ class ProviderProfileScreen extends StatelessWidget {
               width: double.infinity,
               height: 54,
               child: ElevatedButton(
-                onPressed: null,
+                onPressed: () {
+                  final draft = BookingDraft(
+                    service: service,
+                    provider: provider,
+                  );
+
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          CreateBookingScreen(initialDraft: draft),
+                    ),
+                  );
+                },
                 child: const Text('Continue to Booking'),
               ),
             ),

@@ -6,14 +6,22 @@ import '../features/messages/presentation/messages_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 
 class CustomerShell extends StatefulWidget {
-  const CustomerShell({super.key});
+  final int initialIndex;
+
+  const CustomerShell({super.key, this.initialIndex = 0});
 
   @override
   State<CustomerShell> createState() => _CustomerShellState();
 }
 
 class _CustomerShellState extends State<CustomerShell> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   static const List<Widget> _screens = [
     HomeScreen(),
@@ -31,10 +39,7 @@ class _CustomerShellState extends State<CustomerShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onDestinationSelected,
