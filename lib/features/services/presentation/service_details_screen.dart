@@ -2,21 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../domain/service_item.dart';
+import '../../providers/presentation/provider_discovery_screen.dart';
 
 class ServiceDetailsScreen extends StatelessWidget {
   final ServiceItem service;
 
-  const ServiceDetailsScreen({
-    super.key,
-    required this.service,
-  });
+  const ServiceDetailsScreen({super.key, required this.service});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Service Details'),
-      ),
+      appBar: AppBar(title: const Text('Service Details')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
@@ -76,105 +72,101 @@ class ServiceDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-  service.description,
-  style: const TextStyle(
-    color: AppColors.textSecondary,
-    fontSize: 14,
-    height: 1.6,
-  ),
-),
-const SizedBox(height: 20),
-Row(
-  children: [
-    const Icon(
-      Icons.schedule_outlined,
-      color: AppColors.primary,
-      size: 20,
-    ),
-    const SizedBox(width: 8),
-    const Text(
-      'Estimated duration:',
-      style: TextStyle(
-        color: AppColors.textSecondary,
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-      ),
-    ),
-    const SizedBox(width: 6),
-    Text(
-      service.duration,
-      style: const TextStyle(
-        color: AppColors.textPrimary,
-        fontSize: 13,
-        fontWeight: FontWeight.w700,
-      ),
-    ),
-  ],
-),
-      const SizedBox(height: 28),
-
-      if (service.includes.isNotEmpty) ...[
-  const Text(
-    "What's included",
-    style: TextStyle(
-      color: AppColors.textPrimary,
-      fontSize: 19,
-      fontWeight: FontWeight.w700,
-    ),
-  ),
-  const SizedBox(height: 14),
-  Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(
-        color: AppColors.border,
-      ),
-    ),
-    child: Column(
-      children: service.includes
-          .map(
-            (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.check_circle_outline_rounded,
-                    color: AppColors.primary,
-                    size: 19,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
+              service.description,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                height: 1.6,
               ),
             ),
-          )
-          .toList(),
-    ),
-  ),
-  const SizedBox(height: 28),
-],
-      
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Icon(
+                  Icons.schedule_outlined,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Estimated duration:',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  service.duration,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+
+            if (service.includes.isNotEmpty) ...[
+              const Text(
+                "What's included",
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  children: service.includes
+                      .map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.check_circle_outline_rounded,
+                                color: AppColors.primary,
+                                size: 19,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  item,
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 13,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+              const SizedBox(height: 28),
+            ],
+
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.border,
-                ),
+                border: Border.all(color: AppColors.border),
               ),
               child: const Row(
                 children: [
@@ -216,7 +208,14 @@ Row(
               width: double.infinity,
               height: 54,
               child: ElevatedButton(
-                onPressed: null,
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProviderDiscoveryScreen(service: service),
+                    ),
+                  );
+                },
                 child: const Text('Find Professionals'),
               ),
             ),
