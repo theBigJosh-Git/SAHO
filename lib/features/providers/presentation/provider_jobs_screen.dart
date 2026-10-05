@@ -106,6 +106,122 @@ class _ProviderJobCard extends StatelessWidget {
     }
   }
 
+  Future<void> _confirmStatusChange(
+    BuildContext context, {
+    required String title,
+    required String message,
+    required String confirmLabel,
+    required BookingStatus newStatus,
+    required IconData icon,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDCFCE7),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(icon, color: AppColors.success, size: 30),
+                ),
+
+                const SizedBox(height: 20),
+
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+
+                const SizedBox(height: 26),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop(false);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.textPrimary,
+                          side: const BorderSide(color: AppColors.border),
+                          minimumSize: const Size(0, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop(true);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.success,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(0, 50),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        icon: Icon(icon, size: 19),
+                        label: Text(
+                          confirmLabel,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      BookingStore.updateStatus(booking.id, newStatus);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -226,9 +342,14 @@ class _ProviderJobCard extends StatelessWidget {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  BookingStore.updateStatus(
-                    booking.id,
-                    BookingStatus.providerEnRoute,
+                  _confirmStatusChange(
+                    context,
+                    title: 'Start journey?',
+                    message:
+                        'Confirm that you are ready to begin travelling to the customer location.',
+                    confirmLabel: 'Start Journey',
+                    newStatus: BookingStatus.providerEnRoute,
+                    icon: Icons.directions_car_outlined,
                   );
                 },
                 icon: const Icon(Icons.directions_car_outlined),
@@ -245,9 +366,14 @@ class _ProviderJobCard extends StatelessWidget {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  BookingStore.updateStatus(
-                    booking.id,
-                    BookingStatus.inProgress,
+                  _confirmStatusChange(
+                    context,
+                    title: 'Start service?',
+                    message:
+                        'Confirm that you have arrived and are ready to begin the service for this customer.',
+                    confirmLabel: 'Start Service',
+                    newStatus: BookingStatus.inProgress,
+                    icon: Icons.play_arrow_rounded,
                   );
                 },
                 icon: const Icon(Icons.play_arrow_rounded),
@@ -263,9 +389,14 @@ class _ProviderJobCard extends StatelessWidget {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  BookingStore.updateStatus(
-                    booking.id,
-                    BookingStatus.completed,
+                  _confirmStatusChange(
+                    context,
+                    title: 'Complete service?',
+                    message:
+                        'Confirm that the service has been fully completed for this customer. This will mark the booking as completed.',
+                    confirmLabel: 'Complete Service',
+                    newStatus: BookingStatus.completed,
+                    icon: Icons.check_circle_outline,
                   );
                 },
                 icon: const Icon(Icons.check_circle_outline_rounded),

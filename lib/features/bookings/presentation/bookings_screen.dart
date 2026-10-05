@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../data/booking_store.dart';
 import '../domain/booking_item.dart';
+import '../../reviews/data/review_store.dart';
+import '../../reviews/presentation/leave_review_screen.dart';
 
 class BookingsScreen extends StatelessWidget {
   const BookingsScreen({super.key});
@@ -274,6 +276,84 @@ class _BookingCard extends StatelessWidget {
               ),
             ],
           ),
+
+          if (booking.status == BookingStatus.completed) ...[
+            const SizedBox(height: 16),
+            const Divider(color: AppColors.border, height: 1),
+            const SizedBox(height: 16),
+
+            ValueListenableBuilder(
+              valueListenable: ReviewStore.reviews,
+              builder: (context, reviews, child) {
+                final hasReview = ReviewStore.hasReviewForBooking(booking.id);
+                final review = ReviewStore.getReviewForBooking(booking.id);
+
+                if (hasReview && review != null) {
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0FDF4),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFBBF7D0)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.success,
+                          size: 21,
+                        ),
+                        const SizedBox(width: 9),
+                        const Expanded(
+                          child: Text(
+                            'Review submitted',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Color(0xFFF59E0B),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          review.rating.toStringAsFixed(0),
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              LeaveReviewScreen(booking: booking),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.star_outline_rounded),
+                    label: const Text('Leave a Review'),
+                  ),
+                );
+              },
+            ),
+          ],
         ],
       ),
     );
