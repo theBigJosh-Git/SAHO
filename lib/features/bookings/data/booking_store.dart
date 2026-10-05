@@ -18,6 +18,39 @@ class BookingStore {
     }).toList();
   }
 
+  static bool updateStatus(String bookingId, BookingStatus newStatus) {
+    final booking = findById(bookingId);
+
+    if (booking == null) {
+      return false;
+    }
+
+    final allowedTransitions = <BookingStatus, Set<BookingStatus>>{
+      BookingStatus.pending: {
+        BookingStatus.confirmed,
+        BookingStatus.rejected,
+        BookingStatus.cancelled,
+      },
+      BookingStatus.confirmed: {
+        BookingStatus.providerEnRoute,
+        BookingStatus.cancelled,
+      },
+      BookingStatus.providerEnRoute: {BookingStatus.inProgress},
+      BookingStatus.inProgress: {BookingStatus.completed},
+    };
+
+    final allowedNextStatuses = allowedTransitions[booking.status];
+
+    if (allowedNextStatuses == null ||
+        !allowedNextStatuses.contains(newStatus)) {
+      return false;
+    }
+
+    updateBooking(booking.copyWith(status: newStatus));
+
+    return true;
+  }
+
   static BookingItem? findById(String bookingId) {
     for (final booking in bookings.value) {
       if (booking.id == bookingId) {

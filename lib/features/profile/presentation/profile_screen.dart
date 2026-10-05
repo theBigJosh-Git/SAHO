@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../providers/presentation/provider_booking_requests_screen.dart';
+import '../../providers/presentation/provider_jobs_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -84,6 +85,24 @@ class ProfileScreen extends StatelessWidget {
                       );
                     },
                     child: const Text('Test as Michael Adeyemi'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const ProviderJobsScreen(
+                            providerName: 'Michael Adeyemi',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('View Michael\'s Jobs'),
                   ),
                 ),
               ],

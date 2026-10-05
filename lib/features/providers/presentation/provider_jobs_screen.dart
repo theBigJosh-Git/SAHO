@@ -4,33 +4,39 @@ import '../../../core/theme/app_colors.dart';
 import '../../bookings/data/booking_store.dart';
 import '../../bookings/domain/booking_item.dart';
 
-class ProviderBookingRequestsScreen extends StatelessWidget {
+class ProviderJobsScreen extends StatelessWidget {
   final String providerName;
 
-  const ProviderBookingRequestsScreen({super.key, required this.providerName});
+  const ProviderJobsScreen({super.key, required this.providerName});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Booking Requests')),
+      appBar: AppBar(title: const Text('My Jobs')),
       body: SafeArea(
         child: ValueListenableBuilder<List<BookingItem>>(
           valueListenable: BookingStore.bookings,
           builder: (context, bookings, child) {
-            final providerBookings = bookings.where((booking) {
-              return booking.provider.name == providerName &&
-                  booking.status == BookingStatus.pending;
+            final activeJobs = bookings.where((booking) {
+              final belongsToProvider = booking.provider.name == providerName;
+
+              final isActive =
+                  booking.status == BookingStatus.confirmed ||
+                  booking.status == BookingStatus.providerEnRoute ||
+                  booking.status == BookingStatus.inProgress;
+
+              return belongsToProvider && isActive;
             }).toList();
 
-            if (providerBookings.isEmpty) {
-              return const _EmptyRequestsState();
+            if (activeJobs.isEmpty) {
+              return const _EmptyJobsState();
             }
 
             return ListView(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               children: [
                 const Text(
-                  'New requests',
+                  'Active jobs',
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 24,
@@ -39,7 +45,7 @@ class ProviderBookingRequestsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'Review service requests from customers before accepting them.',
+                  'Manage services you have accepted from customers.',
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 14,
@@ -48,10 +54,10 @@ class ProviderBookingRequestsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                ...providerBookings.map(
+                ...activeJobs.map(
                   (booking) => Padding(
                     padding: const EdgeInsets.only(bottom: 14),
-                    child: _ProviderRequestCard(booking: booking),
+                    child: _ProviderJobCard(booking: booking),
                   ),
                 ),
               ],
@@ -63,10 +69,10 @@ class ProviderBookingRequestsScreen extends StatelessWidget {
   }
 }
 
-class _ProviderRequestCard extends StatelessWidget {
+class _ProviderJobCard extends StatelessWidget {
   final BookingItem booking;
 
-  const _ProviderRequestCard({required this.booking});
+  const _ProviderJobCard({required this.booking});
 
   String _formatDate(DateTime date) {
     const months = [
@@ -85,6 +91,19 @@ class _ProviderRequestCard extends StatelessWidget {
     ];
 
     return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
+  String _statusLabel(BookingStatus status) {
+    switch (status) {
+      case BookingStatus.confirmed:
+        return 'Confirmed';
+      case BookingStatus.providerEnRoute:
+        return 'En Route';
+      case BookingStatus.inProgress:
+        return 'In Progress';
+      default:
+        return '';
+    }
   }
 
   @override
@@ -106,12 +125,12 @@ class _ProviderRequestCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDBEAFE),
+                  color: const Color(0xFFDCFCE7),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
                   booking.service.icon,
-                  color: AppColors.primary,
+                  color: AppColors.success,
                   size: 26,
                 ),
               ),
@@ -145,13 +164,13 @@ class _ProviderRequestCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
+                  color: const Color(0xFFDCFCE7),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  'Pending',
-                  style: TextStyle(
-                    color: Color(0xFFB45309),
+                child: Text(
+                  _statusLabel(booking.status),
+                  style: const TextStyle(
+                    color: AppColors.success,
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                   ),
@@ -164,7 +183,7 @@ class _ProviderRequestCard extends StatelessWidget {
           const Divider(color: AppColors.border, height: 1),
           const SizedBox(height: 16),
 
-          _RequestDetail(
+          _JobDetail(
             icon: Icons.calendar_month_outlined,
             text:
                 '${_formatDate(booking.scheduledDate)} • ${booking.scheduledTime}',
@@ -172,14 +191,11 @@ class _ProviderRequestCard extends StatelessWidget {
 
           const SizedBox(height: 11),
 
-          _RequestDetail(
-            icon: Icons.location_on_outlined,
-            text: booking.address,
-          ),
+          _JobDetail(icon: Icons.location_on_outlined, text: booking.address),
 
           if (booking.notes != null && booking.notes!.trim().isNotEmpty) ...[
             const SizedBox(height: 11),
-            _RequestDetail(icon: Icons.notes_outlined, text: booking.notes!),
+            _JobDetail(icon: Icons.notes_outlined, text: booking.notes!),
           ],
 
           const SizedBox(height: 16),
@@ -194,7 +210,7 @@ class _ProviderRequestCard extends StatelessWidget {
               Text(
                 'AED ${booking.startingPrice.toStringAsFixed(0)}',
                 style: const TextStyle(
-                  color: AppColors.primary,
+                  color: AppColors.success,
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
                 ),
@@ -202,54 +218,72 @@ class _ProviderRequestCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
+          if (booking.status == BookingStatus.confirmed) ...[
+            const SizedBox(height: 20),
 
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    BookingStore.updateStatus(
-                      booking.id,
-                      BookingStatus.rejected,
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
-                  ),
-                  child: const Text('Reject'),
-                ),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  BookingStore.updateStatus(
+                    booking.id,
+                    BookingStatus.providerEnRoute,
+                  );
+                },
+                icon: const Icon(Icons.directions_car_outlined),
+                label: const Text('Start Journey'),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    BookingStore.updateStatus(
-                      booking.id,
-                      BookingStatus.confirmed,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.success,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Accept'),
-                ),
+            ),
+          ],
+
+          if (booking.status == BookingStatus.providerEnRoute) ...[
+            const SizedBox(height: 20),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  BookingStore.updateStatus(
+                    booking.id,
+                    BookingStatus.inProgress,
+                  );
+                },
+                icon: const Icon(Icons.play_arrow_rounded),
+                label: const Text('Start Service'),
               ),
-            ],
-          ),
+            ),
+          ],
+          if (booking.status == BookingStatus.inProgress) ...[
+            const SizedBox(height: 20),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  BookingStore.updateStatus(
+                    booking.id,
+                    BookingStatus.completed,
+                  );
+                },
+                icon: const Icon(Icons.check_circle_outline_rounded),
+                label: const Text('Complete Service'),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-class _RequestDetail extends StatelessWidget {
+class _JobDetail extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _RequestDetail({required this.icon, required this.text});
+  const _JobDetail({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -273,8 +307,8 @@ class _RequestDetail extends StatelessWidget {
   }
 }
 
-class _EmptyRequestsState extends StatelessWidget {
-  const _EmptyRequestsState();
+class _EmptyJobsState extends StatelessWidget {
+  const _EmptyJobsState();
 
   @override
   Widget build(BuildContext context) {
@@ -288,18 +322,18 @@ class _EmptyRequestsState extends StatelessWidget {
               width: 76,
               height: 76,
               decoration: BoxDecoration(
-                color: const Color(0xFFDBEAFE),
+                color: const Color(0xFFDCFCE7),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: const Icon(
-                Icons.inbox_outlined,
-                color: AppColors.primary,
+                Icons.work_outline,
+                color: AppColors.success,
                 size: 38,
               ),
             ),
             const SizedBox(height: 18),
             const Text(
-              'No new requests',
+              'No active jobs',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textPrimary,
@@ -309,7 +343,7 @@ class _EmptyRequestsState extends StatelessWidget {
             ),
             const SizedBox(height: 7),
             const Text(
-              'New customer booking requests will appear here.',
+              'Accepted customer bookings will appear here.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textSecondary,
